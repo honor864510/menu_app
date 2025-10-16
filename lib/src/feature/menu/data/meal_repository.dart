@@ -5,7 +5,8 @@ import 'package:menu_app/src/feature/menu/model/meal_entity.dart';
 
 abstract interface class IMealRepository {
   Future<List<MealCategoryEntity>> fetchCategories();
-  Future<(int, List<MealEntity>)> fetchMeals(String? categoryId, {int? limit, int? offset});
+  Future<(int count, List<MealEntity> meals)> fetchMeals(String? categoryId, {int? limit, int? offset});
+  Future<(int count, List<MealEntity> meals)> searchMeals(String query, {String? categoryId});
 }
 
 final class FakeMealRepository implements IMealRepository {
@@ -31,7 +32,7 @@ final class FakeMealRepository implements IMealRepository {
   Future<List<MealCategoryEntity>> fetchCategories() => Future.value(_categories);
 
   @override
-  Future<(int, List<MealEntity>)> fetchMeals(String? categoryId, {int? limit, int? offset}) async {
+  Future<(int count, List<MealEntity> meals)> fetchMeals(String? categoryId, {int? limit, int? offset}) async {
     if (categoryId == null) return (0, <MealEntity>[]);
 
     // Find the category to get the file name
@@ -56,5 +57,38 @@ final class FakeMealRepository implements IMealRepository {
     final paginatedMeals = allMeals.sublist(startIndex.clamp(0, totalCount), endIndex.clamp(0, totalCount));
 
     return (totalCount, paginatedMeals);
+  }
+
+  @override
+  Future<(int count, List<MealEntity> meals)> searchMeals(String query, {String? categoryId}) async {
+    if (query.isEmpty) {
+      // If query is empty, return empty results
+      return (0, <MealEntity>[]);
+    }
+
+    final searchTerm = query.toLowerCase();
+    final searchResults = <MealEntity>[];
+
+    // Determine which categories to search in
+    final categoriesToSearch = categoryId != null
+        ? [_categories.firstWhere((cat) => cat.id == categoryId)]
+        : _categories;
+
+    // Search through each relevant category
+    for (final category in categoriesToSearch) {
+      // Load the JSON file from assets
+      final jsonString = await rootBundle.loadString('assets/menus/${category.fileName}');
+      final jsonData = json.decode(jsonString) as List;
+
+      // Convert to MealEntity list and filter by search term
+      final categoryMeals = jsonData
+          .map((mealJson) => MealEntity.fromJson(mealJson as Map<String, dynamic>))
+          .where((meal) => meal.name.toLowerCase().contains(searchTerm))
+          .toList();
+
+      searchResults.addAll(categoryMeals);
+    }
+
+    return (searchResults.length, searchResults);
   }
 }

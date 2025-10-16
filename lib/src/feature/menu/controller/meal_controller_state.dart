@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:menu_app/src/common/pagination_cursor.dart';
 import 'package:menu_app/src/feature/menu/model/meal_category_entity.dart';
 import 'package:menu_app/src/feature/menu/model/meal_entity.dart';
 
@@ -7,26 +8,39 @@ final class MealControllerStateEntity {
   const MealControllerStateEntity({
     required this.meals,
     required this.categories,
+    required this.cursor,
     required this.mealsCount,
     required this.selectedMeal,
     required this.selectedCategory,
   });
 
+  factory MealControllerStateEntity.initial() => MealControllerStateEntity(
+    categories: const [],
+    meals: const [],
+    cursor: PaginationCursor.initial(),
+    mealsCount: 0,
+    selectedCategory: null,
+    selectedMeal: null,
+  );
+
   final List<MealEntity> meals;
-  final List<MealEntity> categories;
+  final List<MealCategoryEntity> categories;
+  final PaginationCursor cursor;
   final int mealsCount;
-  final MealEntity selectedMeal;
-  final MealCategoryEntity selectedCategory;
+  final MealEntity? selectedMeal;
+  final MealCategoryEntity? selectedCategory;
 
   MealControllerStateEntity copyWith({
     List<MealEntity>? meals,
-    List<MealEntity>? categories,
+    List<MealCategoryEntity>? categories,
+    PaginationCursor? cursor,
     int? mealsCount,
     MealEntity? selectedMeal,
     MealCategoryEntity? selectedCategory,
   }) => MealControllerStateEntity(
     meals: meals ?? this.meals,
     categories: categories ?? this.categories,
+    cursor: cursor ?? this.cursor,
     mealsCount: mealsCount ?? this.mealsCount,
     selectedMeal: selectedMeal ?? this.selectedMeal,
     selectedCategory: selectedCategory ?? this.selectedCategory,
@@ -40,6 +54,7 @@ final class MealControllerStateEntity {
     return other is MealControllerStateEntity &&
         listEquals(other.meals, meals) &&
         listEquals(other.categories, categories) &&
+        cursor == other.cursor &&
         other.mealsCount == mealsCount &&
         other.selectedMeal == selectedMeal &&
         other.selectedCategory == selectedCategory;
@@ -47,7 +62,12 @@ final class MealControllerStateEntity {
 
   @override
   int get hashCode =>
-      meals.hashCode ^ categories.hashCode ^ mealsCount.hashCode ^ selectedMeal.hashCode ^ selectedCategory.hashCode;
+      meals.hashCode ^
+      categories.hashCode ^
+      cursor.hashCode ^
+      mealsCount.hashCode ^
+      selectedMeal.hashCode ^
+      selectedCategory.hashCode;
 }
 
 /// {@template meal_controller_state}
