@@ -73,15 +73,15 @@ final class MealController extends StateController<MealControllerState> with Seq
         hasMore: hasMore,
         offset: state.data.cursor.offset + (hasMore ? state.data.cursor.limit : meals.length),
       );
-      final newMealIds = meals.map((e) => e.id);
+
+      // Merge new meals with existing ones, avoiding duplicates by id
+      final existingMealIds = state.data.meals.map((e) => e.id).toSet();
+      final uniqueNewMeals = meals.where((meal) => !existingMealIds.contains(meal.id)).toList();
+      final allMeals = [...state.data.meals, ...uniqueNewMeals];
 
       setState(
         MealControllerState.processing(
-          data: state.data.copyWith(
-            mealsCount: mealsCount,
-            meals: [...state.data.meals.where((meal) => !newMealIds.contains(meal.id)), ...meals],
-            cursor: updatedCursor,
-          ),
+          data: state.data.copyWith(mealsCount: mealsCount, meals: allMeals, cursor: updatedCursor),
           message: 'Meals fetched',
         ),
       );

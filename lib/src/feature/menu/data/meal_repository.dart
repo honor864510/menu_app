@@ -45,16 +45,19 @@ final class FakeMealRepository implements IMealRepository {
     final jsonString = await rootBundle.loadString('assets/menus/${category.fileName}');
     final jsonData = json.decode(jsonString) as List;
 
-    // Convert to MealEntity list
+    // Convert to MealEntity list and remove duplicates by id
     final allMeals = jsonData.map((mealJson) => MealEntity.fromJson(mealJson as Map<String, dynamic>)).toList();
 
+    // Remove duplicates by id
+    final uniqueMeals = _removeDuplicateMeals(allMeals);
+
     // Apply pagination
-    final totalCount = allMeals.length;
+    final totalCount = uniqueMeals.length;
     final startIndex = offset ?? 0;
     final endIndex = limit != null ? startIndex + limit : totalCount;
 
     // Ensure we don't go out of bounds
-    final paginatedMeals = allMeals.sublist(startIndex.clamp(0, totalCount), endIndex.clamp(0, totalCount));
+    final paginatedMeals = uniqueMeals.sublist(startIndex.clamp(0, totalCount), endIndex.clamp(0, totalCount));
 
     return (totalCount, paginatedMeals);
   }
@@ -62,11 +65,10 @@ final class FakeMealRepository implements IMealRepository {
   @override
   Future<(int count, List<MealEntity> meals)> searchMeals(String query, {String? categoryId}) async {
     if (query.isEmpty) {
-      // If query is empty, return empty results
       return (0, <MealEntity>[]);
     }
 
-    final searchTerm = query.toLowerCase();
+    final searchTerm = query.trim().toLowerCase();
     final searchResults = <MealEntity>[];
 
     // Determine which categories to search in
@@ -89,6 +91,14 @@ final class FakeMealRepository implements IMealRepository {
       searchResults.addAll(categoryMeals);
     }
 
-    return (searchResults.length, searchResults);
+    // Remove duplicates from search results
+    final uniqueResults = _removeDuplicateMeals(searchResults);
+    return (uniqueResults.length, uniqueResults);
+  }
+
+  /// Remove duplicate meals by id
+  List<MealEntity> _removeDuplicateMeals(List<MealEntity> meals) {
+    final seenIds = <String>{};
+    return meals.where((meal) => seenIds.add(meal.id)).toList();
   }
 }
