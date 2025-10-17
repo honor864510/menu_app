@@ -28,6 +28,7 @@ final class MealController extends StateController<MealControllerState> with Seq
     error: (error, stackTrace) async =>
         setState(MealControllerState.failed(data: state.data, message: 'Failed to fetch categories')),
     done: () async => setState(MealControllerState.idle(data: state.data, message: 'Idle')),
+    name: 'fetchCategories',
   );
 
   void fetchMeals() => handle(
@@ -54,6 +55,7 @@ final class MealController extends StateController<MealControllerState> with Seq
     error: (error, stackTrace) async =>
         setState(MealControllerState.failed(data: state.data, message: 'Failed to fetch meals')),
     done: () async => setState(MealControllerState.idle(data: state.data, message: 'Idle')),
+    name: 'fetchMeals',
   );
 
   void fetchMoreMeals() => handle(
@@ -89,6 +91,7 @@ final class MealController extends StateController<MealControllerState> with Seq
     error: (error, stackTrace) async =>
         setState(MealControllerState.failed(data: state.data, message: 'Failed to fetch meals')),
     done: () async => setState(MealControllerState.idle(data: state.data, message: 'Idle')),
+    name: 'fetchMoreMeals',
   );
 
   /// Select a category and optionally fetch meals for that category
@@ -127,6 +130,7 @@ final class MealController extends StateController<MealControllerState> with Seq
     error: (error, stackTrace) async =>
         setState(MealControllerState.failed(data: state.data, message: 'Failed to select category')),
     done: () async => setState(MealControllerState.idle(data: state.data, message: 'Idle')),
+    name: 'selectCategory',
   );
 
   /// Select a meal for detailed view
@@ -195,6 +199,7 @@ final class MealController extends StateController<MealControllerState> with Seq
     error: (error, stackTrace) async =>
         setState(MealControllerState.failed(data: state.data, message: 'Failed to refresh data')),
     done: () async => setState(MealControllerState.idle(data: state.data, message: 'Idle')),
+    name: 'selectMeal',
   );
 
   /// Search meals by query
@@ -218,5 +223,6 @@ final class MealController extends StateController<MealControllerState> with Seq
     error: (error, stackTrace) async =>
         setState(MealControllerState.failed(data: state.data, message: 'Failed to search meals')),
     done: () async => setState(MealControllerState.idle(data: state.data, message: 'Idle')),
+    name: 'searchMeals',
   );
 }
