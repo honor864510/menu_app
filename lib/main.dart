@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:control/control.dart';
 import 'package:flutter/material.dart';
 import 'package:menu_app/src/common/controller_observer.dart';
-import 'package:menu_app/src/feature/menu/widget/meals_screen.dart';
+import 'package:menu_app/src/common/navigator/app_navigator.dart';
+import 'package:menu_app/src/common/navigator/app_route_observer.dart';
+import 'package:menu_app/src/common/navigator/pages.dart';
 
 @pragma('vm:entry-point')
 void main([List<String>? args]) => runZonedGuarded<void>(
   () async {
-    WidgetsFlutterBinding.ensureInitialized();
+    WidgetsFlutterBinding.ensureInitialized().deferFirstFrame();
 
     Controller.observer = const ControllerObserver();
 
@@ -35,8 +37,16 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
   final Key builderKey = GlobalKey();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.allowFirstFrame();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) => MaterialApp(
-    home: const MealsScreen(),
-    builder: (context, child) => KeyedSubtree(key: builderKey, child: child ?? const SizedBox.shrink()),
+    builder: (context, child) =>
+        AppNavigator(key: builderKey, pages: const [DashboardPage()], observers: [AppRouteObserver()]),
   );
 }
