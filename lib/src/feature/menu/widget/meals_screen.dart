@@ -131,6 +131,9 @@ class _CategoriesSection extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
     height: 80,
     child: StateConsumer<MealController, MealControllerState>(
+      buildWhen: (previous, current) =>
+          previous.data.selectedCategory != current.data.selectedCategory ||
+          previous.data.categories != current.data.categories,
       builder: (context, state, _) {
         final categories = state.data.categories;
         final selected = state.data.selectedCategory;
@@ -196,6 +199,10 @@ class _MealsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StateConsumer<MealController, MealControllerState>(
+    buildWhen: (previous, current) =>
+        previous.data.meals != current.data.meals ||
+        previous.data.cursor != current.data.cursor ||
+        previous.data.selectedCategory != current.data.selectedCategory,
     builder: (context, state, _) {
       final meals = state.data.meals;
       final hasMore = state.data.cursor.hasMore;
