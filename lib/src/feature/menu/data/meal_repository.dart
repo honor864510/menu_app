@@ -33,6 +33,8 @@ final class FakeMealRepository implements IMealRepository {
 
   @override
   Future<(int count, List<MealEntity> meals)> fetchMeals(String? categoryId, {int? limit, int? offset}) async {
+    await Future<void>.delayed(const Duration(seconds: 2));
+
     if (categoryId == null) return (0, <MealEntity>[]);
 
     // Find the category to get the file name
@@ -64,6 +66,8 @@ final class FakeMealRepository implements IMealRepository {
 
   @override
   Future<(int count, List<MealEntity> meals)> searchMeals(String query, {String? categoryId}) async {
+    await Future<void>.delayed(const Duration(seconds: 2));
+
     if (query.isEmpty) {
       return (0, <MealEntity>[]);
     }
