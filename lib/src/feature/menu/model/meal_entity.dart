@@ -1,10 +1,7 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 
-part 'meal_entity.g.dart';
-
 @immutable
-@JsonSerializable()
 class MealEntity {
   const MealEntity({
     required this.id,
@@ -16,47 +13,61 @@ class MealEntity {
     required this.country,
   });
 
-  factory MealEntity.fromJson(Map<String, dynamic> json) => _$MealEntityFromJson(json);
+  factory MealEntity.fromJson(Map<String, dynamic> json) => MealEntity(
+    id: json['id'] as String? ?? '',
+    img: json['img'] as String? ?? '',
+    name: json['name'] as String? ?? '',
+    dsc: json['dsc'] as String? ?? '',
+    price: _priceFromJson(json['price']),
+    rate: _rateFromJson(json['rate']),
+    country: json['country'] as String? ?? '',
+  );
 
   final String id;
   final String img;
   final String name;
   final String dsc;
-  @JsonKey(fromJson: _priceFromJson, toJson: _priceToJson)
   final double price;
-  @JsonKey(fromJson: _rateFromJson, toJson: _rateToJson)
   final double rate;
   final String country;
 
-  Map<String, dynamic> toJson() => _$MealEntityToJson(this);
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'img': img,
+    'name': name,
+    'dsc': dsc,
+    'price': price,
+    'rate': rate,
+    'country': country,
+  };
 
   // Handle both int and double prices from JSON
-  static double _priceFromJson(num? value) {
+  static double _priceFromJson(Object? value) {
     if (value is int) {
       return value.toDouble();
     } else if (value is double) {
       return value;
     } else if (value is String) {
-      return double.tryParse(value.toString()) ?? 0.0;
+      return double.tryParse(value) ?? 0.0;
+    } else if (value is num) {
+      return value.toDouble();
     }
     return 0;
   }
-
-  static dynamic _priceToJson(double price) => price;
 
   // Handle both int and double rates from JSON
-  static double _rateFromJson(num? value) {
+  static double _rateFromJson(Object? value) {
     if (value is int) {
       return value.toDouble();
     } else if (value is double) {
       return value;
     } else if (value is String) {
-      return double.tryParse(value.toString()) ?? 0.0;
+      return double.tryParse(value) ?? 0.0;
+    } else if (value is num) {
+      return value.toDouble();
     }
     return 0;
   }
-
-  static dynamic _rateToJson(double rate) => rate;
 
   MealEntity copyWith({
     String? id,
